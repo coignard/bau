@@ -2,9 +2,7 @@
   <img height="80" src="Bau/Assets.xcassets/AppIcon.appiconset/128x128.png" />
 </p>
 
-# Bau
-
-A minimalist macOS app that displays a persistent focus reminder floating on your screen. Drag it anywhere, and it stays visible on top of all windows across all spaces and applications.
+**Bau** — A minimalist macOS app that displays a persistent focus reminder floating on your screen. Drag it anywhere, and it stays visible on top of all windows across all spaces and applications.
 
 ![Screenshot](screenshot.png)
 
