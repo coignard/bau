@@ -185,7 +185,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         input.maximumNumberOfLines = 1
 
         alert.accessoryView = input
-        alert.addButton(withTitle: "Los geht's")
+        alert.addButton(withTitle: "Los geht’s")
         let cancelButton = alert.addButton(withTitle: "Abbrechen")
         cancelButton.keyEquivalent = "\u{1b}"
         alert.window.initialFirstResponder = input
@@ -268,7 +268,7 @@ extension LimitedTextField: NSTextFieldDelegate {
 }
 
 class FloatingWindow {
-    private var window: NSWindow?
+    private var window: NSPanel?
     private let text: String
     private var contentView: FloatingContentView?
     private var spaceChangeObserver: NSObjectProtocol?
@@ -314,30 +314,27 @@ class FloatingWindow {
             )
         }
 
-        window = NSWindow(
+        let panel = NSPanel(
             contentRect: NSRect(origin: origin, size: size),
-            styleMask: .borderless,
+            styleMask: [.borderless, .nonactivatingPanel],
             backing: .buffered,
-            defer: false,
-            screen: screen
+            defer: false
         )
 
-        guard let window = window else {
-            logger.error("Failed to create window")
-            return
-        }
+        panel.isOpaque = false
+        panel.backgroundColor = .clear
+        panel.level = .floating
+        panel.collectionBehavior = [.canJoinAllSpaces, .stationary, .fullScreenAuxiliary]
+        panel.hasShadow = false
+        panel.ignoresMouseEvents = false
+        panel.contentView = contentView
+        panel.isReleasedWhenClosed = false
+        panel.becomesKeyOnlyIfNeeded = true
 
-        window.isOpaque = false
-        window.backgroundColor = .clear
-        window.level = .floating
-        window.collectionBehavior = [.canJoinAllSpaces, .stationary, .fullScreenAuxiliary]
-        window.hasShadow = false
-        window.ignoresMouseEvents = false
-        window.contentView = contentView
-        window.isReleasedWhenClosed = false
+        window = panel
 
-        contentView.onPositionChange = { [weak self, weak window] in
-            if let origin = window?.frame.origin {
+        contentView.onPositionChange = { [weak self, weak panel] in
+            if let origin = panel?.frame.origin {
                 self?.onPositionChange?(origin)
             }
         }
@@ -346,8 +343,8 @@ class FloatingWindow {
             forName: NSWorkspace.activeSpaceDidChangeNotification,
             object: nil,
             queue: .main
-        ) { [weak window] _ in
-            window?.orderFront(nil)
+        ) { [weak panel] _ in
+            panel?.orderFront(nil)
         }
     }
 
@@ -503,7 +500,6 @@ class FloatingContentView: NSView {
     }
 
     override func mouseDown(with event: NSEvent) {
-        window?.makeFirstResponder(self)
         initialMouseOffset = event.locationInWindow
     }
 
